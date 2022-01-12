@@ -65,7 +65,7 @@ func Test_validateInputs(t *testing.T) {
 			name: "Case error, invalid elapsed time #2",
 			args: args{
 				inputs: []string{
-					"00:00:00.000 0", "00:09:00.123 299", "00:09:00.123 299",
+					"00:00:00.000 0", "00:04:00.123 299", "00:03:00.123 677",
 				},
 			},
 			wantErr: true,
