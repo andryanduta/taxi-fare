@@ -8,10 +8,10 @@ import (
 )
 
 type Config struct {
-	FaseRules map[string]*struct {
+	FaseRule map[string]*struct {
 		Price             float64
-		Distance          int
-		DistanceThreshold int
+		Distance          float64
+		DistanceThreshold float64
 	}
 }
 
