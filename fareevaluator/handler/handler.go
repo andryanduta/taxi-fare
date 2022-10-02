@@ -16,6 +16,7 @@ const (
 	timeFormat   = "15:04:05.000"
 	timeInterval = 300
 	validPattern = `^\d\d:\d\d:\d\d.\d\d\d\s\d+\.?\d*$`
+	maxMileage   = float64(99999999.9)
 )
 
 type handler struct {
@@ -72,6 +73,9 @@ func isMileageValid(current float64, before float64) bool {
 	if current == 0 {
 		return false
 	}
+	if current >= maxMileage {
+		return false
+	}
 	return before <= current
 }
 
@@ -105,7 +109,6 @@ func validateInputs(inputs []string) error {
 		if err != nil {
 			return err
 		}
-
 		mileage, err := strconv.ParseFloat(splitString[1], 64)
 		if err != nil {
 			return err
@@ -120,7 +123,6 @@ func validateInputs(inputs []string) error {
 				return ErrInvalidElapsedTime
 			}
 		}
-
 		timeBefore = elapsedTime
 		mileageBefore = mileage
 	}

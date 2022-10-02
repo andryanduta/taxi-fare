@@ -1,6 +1,8 @@
 package service
 
 import (
+	"math"
+
 	"github.com/andryanduta/taxi-fare/fareevaluator"
 )
 
@@ -69,10 +71,10 @@ func New(options ...Option) *Service {
 	return service
 }
 
-func (s *Service) CalculateFare(distanceMeters []fareevaluator.DistanceMeter) (taxiFare float64, err error) {
-
+func (s *Service) CalculateFare(distanceMeters []fareevaluator.DistanceMeter) (taxiFareRounded int64, err error) {
+	var taxiFare float64
 	if len(distanceMeters) < 2 {
-		return taxiFare, fareevaluator.ErrDistanceMeterArraySize
+		return 0, fareevaluator.ErrDistanceMeterArraySize
 	}
 
 	taxiFare = s.config.fareRule[ScopeFareBase].Price
@@ -80,7 +82,7 @@ func (s *Service) CalculateFare(distanceMeters []fareevaluator.DistanceMeter) (t
 	// base calculation
 	mileage := (distanceMeters[len(distanceMeters)-1].Mileage - distanceMeters[0].Mileage)
 	if mileage <= s.config.fareRule[ScopeFareBase].Distance {
-		return taxiFare, nil
+		return int64(taxiFare), nil
 	}
 
 	// upto calculation
@@ -88,11 +90,13 @@ func (s *Service) CalculateFare(distanceMeters []fareevaluator.DistanceMeter) (t
 	remainderDistanceFareRule := s.config.fareRule[ScopeFareUpTo].DistanceThreshold - s.config.fareRule[ScopeFareBase].Distance
 	if mileage <= remainderDistanceFareRule {
 		taxiFare = taxiFare + (s.config.fareRule[ScopeFareUpTo].Price * (mileage / s.config.fareRule[ScopeFareUpTo].Distance))
-		return taxiFare, nil
+		taxiFareRounded = int64(math.Round((taxiFare)))
+		return taxiFareRounded, nil
 	}
 	taxiFare = taxiFare + (s.config.fareRule[ScopeFareUpTo].Price * (remainderDistanceFareRule / s.config.fareRule[ScopeFareUpTo].Distance))
 
 	// over calculation
 	taxiFare = taxiFare + (s.config.fareRule[ScopeFareOver].Price * ((mileage - remainderDistanceFareRule) / s.config.fareRule[ScopeFareOver].Distance))
-	return taxiFare, nil
+	taxiFareRounded = int64(math.Round((taxiFare)))
+	return taxiFareRounded, nil
 }

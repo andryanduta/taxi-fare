@@ -35,7 +35,7 @@ func TestService_CalculateFare(t *testing.T) {
 		name         string
 		fields       fields
 		args         args
-		wantTaxiFare float64
+		wantTaxiFare int64
 		wantErr      bool
 	}{
 		{
@@ -101,7 +101,7 @@ func TestService_CalculateFare(t *testing.T) {
 					},
 				},
 			},
-			wantTaxiFare: 3814.285714285714,
+			wantTaxiFare: 3814,
 			wantErr:      false,
 		},
 		{

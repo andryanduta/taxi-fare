@@ -34,10 +34,10 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // CalculateFare mocks base method
-func (m *MockService) CalculateFare(arg0 []fareevaluator.DistanceMeter) (float64, error) {
+func (m *MockService) CalculateFare(arg0 []fareevaluator.DistanceMeter) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CalculateFare", arg0)
-	ret0, _ := ret[0].(float64)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

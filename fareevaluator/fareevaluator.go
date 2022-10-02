@@ -10,7 +10,7 @@ type DistanceMeter struct {
 //go:generate mockgen -destination mockservice/mock_service.go -package mockservice github.com/andryanduta/taxi-fare/fareevaluator Service
 
 type Service interface {
-	CalculateFare(distanceMeters []DistanceMeter) (float64, error)
+	CalculateFare(distanceMeters []DistanceMeter) (int64, error)
 }
 
 var defaultService Service

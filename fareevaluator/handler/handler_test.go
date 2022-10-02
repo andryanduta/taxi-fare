@@ -26,6 +26,15 @@ func Test_validateInputs(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "Case error, reached max mileage",
+			args: args{
+				inputs: []string{
+					"00:00:00.000 0", "00:03:00.123 10000", "00:05:00.123 90000", "00:06:00.123 99999999.9",
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "Case error, invalid size",
 			args: args{
 				inputs: []string{
