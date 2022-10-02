@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -53,12 +54,24 @@ func (h *handler) HandleFareEvaluator() {
 		log.Fatalf("[Handler Fare Evaluator] bad request input, inputs: %s, err: %+v\n", inputs, err)
 	}
 	var distanceMeters []fareevaluator.DistanceMeter
-	for _, input := range inputs {
+	type IndexMileage struct {
+		Index       int
+		MileageDiff float64
+	}
+	var idxMileages []IndexMileage
+	var mileageBefore float64
+	for i, input := range inputs {
 		distanceMeter, err := constructInput(input)
 		if err != nil {
 			log.Fatalf("[Handler Fare Evaluator] error constructInput, input: %s, err: %+v\n", input, err)
 		}
 		distanceMeters = append(distanceMeters, distanceMeter)
+		curr := distanceMeter.Mileage - mileageBefore
+		idxMileages = append(idxMileages, IndexMileage{
+			Index:       i,
+			MileageDiff: curr,
+		})
+		mileageBefore = distanceMeter.Mileage
 	}
 
 	res, err := h.adEvaluatorSvc.CalculateFare(distanceMeters)
@@ -66,7 +79,16 @@ func (h *handler) HandleFareEvaluator() {
 		log.Fatalf("[Handler Fare Evaluator] error CalculateFare, distanceMeters: %+v, err: %+v\n", distanceMeters, err)
 	}
 
+	sort.Slice(idxMileages, func(i, j int) bool {
+		return idxMileages[i].MileageDiff > idxMileages[j].MileageDiff
+	})
+
+	// display all of the input data with mileage difference compared to previous
+	// data, and order it from highest to lowest
 	log.Println(res)
+	for _, data := range idxMileages {
+		log.Println(distanceMeters[data.Index].ElapsedTime, distanceMeters[data.Index].Mileage, data.MileageDiff)
+	}
 }
 
 func isMileageValid(current float64, before float64) bool {

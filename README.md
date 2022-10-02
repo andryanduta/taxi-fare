@@ -60,7 +60,10 @@ Input contains two main object. Check below format as an example. Press enter to
 
 ### Output
 
-Taxi fare output 
+Taxi fare output includes taxi fare and mileage difference compared to previous data, and order it from highest to lowest 
 ```
-411.11
+411
+00:05:00.128 1111.1 733.5999999999999
+00:03:00.123 377.5 377.5
+00:00:00.000 0 0
 ```
