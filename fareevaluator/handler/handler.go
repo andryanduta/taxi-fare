@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/andryanduta/taxi-fare/fareevaluator"
+	zerolog "github.com/rs/zerolog/log"
 )
 
 const (
@@ -38,12 +39,13 @@ func (h *handler) HandleFareEvaluator() {
 	for {
 		line, _, err := reader.ReadLine()
 		if err != nil {
-			log.Println("[Handler Fare Evaluator] error ReadLine", err)
+			zerolog.Error().Err(err).Msg("[Handler Fare Evaluator] error ReadLine")
 			break
 		}
 
 		strInput := string(line)
 		if strInput == "" {
+			zerolog.Debug().Msg("[Handler Fare Evaluator] strInput is empty")
 			break
 		}
 
@@ -51,7 +53,7 @@ func (h *handler) HandleFareEvaluator() {
 	}
 	err := validateInputs(inputs)
 	if err != nil {
-		log.Fatalf("[Handler Fare Evaluator] bad request input, inputs: %s, err: %+v\n", inputs, err)
+		zerolog.Fatal().Err(err).Any("inputs", inputs).Msg("[Handler Fare Evaluator] bad request input")
 	}
 	var distanceMeters []fareevaluator.DistanceMeter
 	type IndexMileage struct {
@@ -63,7 +65,7 @@ func (h *handler) HandleFareEvaluator() {
 	for i, input := range inputs {
 		distanceMeter, err := constructInput(input)
 		if err != nil {
-			log.Fatalf("[Handler Fare Evaluator] error constructInput, input: %s, err: %+v\n", input, err)
+			zerolog.Fatal().Err(err).Any("inputs", inputs).Msg("[Handler Fare Evaluator] error constructInput")
 		}
 		distanceMeters = append(distanceMeters, distanceMeter)
 		curr := distanceMeter.Mileage - mileageBefore
@@ -76,7 +78,7 @@ func (h *handler) HandleFareEvaluator() {
 
 	res, err := h.adEvaluatorSvc.CalculateFare(distanceMeters)
 	if err != nil {
-		log.Fatalf("[Handler Fare Evaluator] error CalculateFare, distanceMeters: %+v, err: %+v\n", distanceMeters, err)
+		zerolog.Fatal().Err(err).Any("distanceMeters", distanceMeters).Msg("[Handler Fare Evaluator] error CalculateFare")
 	}
 
 	sort.Slice(idxMileages, func(i, j int) bool {

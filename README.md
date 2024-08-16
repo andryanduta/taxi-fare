@@ -7,7 +7,7 @@ A program to evaluate and calculate taxi fare based on input Time and Distance. 
 To follow the example in this article, you will need:
 - A Go workspace set up 
 
-note: I use go version v1.14.4 when developing the program
+note: I use go version v1.18.6 when developing the program
 
 ## Requirements
 

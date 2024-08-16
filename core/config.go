@@ -15,6 +15,8 @@ type Config struct {
 	}
 }
 
+var readFile = gcfg.ReadFileInto
+
 func InitMainConfig() (*Config, error) {
 	cfg := Config{}
 	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -22,7 +24,7 @@ func InitMainConfig() (*Config, error) {
 		return &cfg, err
 	}
 
-	err = gcfg.ReadFileInto(&cfg, path+"/config-main.ini")
+	err = readFile(&cfg, path+"/config-main.ini")
 	if err != nil {
 		return &cfg, err
 	}

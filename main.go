@@ -1,22 +1,43 @@
 package main
 
 import (
-	"log"
+	"io"
+	"os"
 
 	core "github.com/andryanduta/taxi-fare/core"
 	"github.com/andryanduta/taxi-fare/fareevaluator"
 	fareevaluatorhandler "github.com/andryanduta/taxi-fare/fareevaluator/handler"
 	fareevaluatorservice "github.com/andryanduta/taxi-fare/fareevaluator/service"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
+
+func setupLogger() {
+	// Open a file for logging
+	logFile, err := os.OpenFile("logfile.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+
+	multi := io.MultiWriter(os.Stdout, os.Stderr, logFile)
+
+	log.Logger = zerolog.New(multi).With().
+		Timestamp().
+		Caller().
+		Logger().
+		Level(zerolog.InfoLevel)
+}
+
+func init() {
+	setupLogger()
+}
 
 func main() {
 
 	mainConfig, err := core.InitMainConfig()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Err(err).Msg("[main] error InitMainConfig")
 	}
-
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	// Init Fare Evaluator
 	fareRulesSetting := make(map[fareevaluatorservice.Scope]fareevaluatorservice.FareRule)
@@ -24,6 +45,7 @@ func main() {
 		scope, ok := fareevaluatorservice.ScopeValue[key]
 		if !ok {
 			// Skip if scope key rule is unrecognized by Fare Evaluator service
+			log.Debug().Str("key", key).Msg("[main] scope key is unrecognized")
 			continue
 		}
 
